@@ -1,0 +1,25 @@
+name: Construir y Publicar la imagen de Docker #crear nombre del workflow
+
+on: #se ejecuta cuando alguien hace un push a la rama main
+  push:
+    branches: [ "main" ]
+
+jobs:
+
+    build:
+      runs-on: ubuntu-latest #se ejecuta en un ambiente de ubuntu
+      steps:
+        - name: Verificar codigo
+          uses: actions/checkout@v4 #verificar el codigo del repositorio
+
+        - name: Inicio de sesion en DockerHub
+          uses: docker/login-action@v3 #iniciar sesion en dockerhub
+          with: #secretos para iniciar sesion en dockerhub
+            username: ${{ secrets.DOCKER_USERNAME }} #usuario de dockerhub almacenado en secrets
+            password: ${{ secrets.DOCKER_PASSWORD }} #contraseña de dockerhub almacenada en secrets
+
+        - name: Construir imagen
+          run: docker build -t ${{ secrets.DOCKER_USERNAME }}/mi-api:latest .
+
+        - name: Push de la imagen
+          run: docker push ${{ secrets.DOCKER_USERNAME }}/mi-api:latest
